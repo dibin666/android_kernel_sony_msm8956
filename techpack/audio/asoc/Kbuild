@@ -179,6 +179,9 @@ ifdef CONFIG_SND_SOC_QDSP6V2
 	PLATFORM_OBJS += msm-transcode-loopback-q6-v2.o
 	PLATFORM_OBJS += platform_init.o
 endif
+ifdef CONFIG_AHC
+	PLATFORM_OBJS += msm-ahc-config.o
+endif
 ifdef CONFIG_DOLBY_DS2
 	PLATFORM_OBJS += msm-ds2-dap-config.o
 endif
