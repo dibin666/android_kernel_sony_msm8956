@@ -454,7 +454,7 @@ int snd_soc_put_volsw_sx(struct snd_kcontrol *kcontrol,
 	val = ucontrol->value.integer.value[0];
 	if (mc->platform_max && ((int)val + min) > mc->platform_max)
 		return -EINVAL;
-	if (val > max)
+	if (val > max - min)
 		return -EINVAL;
 	val_mask = mask << shift;
 	val = (val + min) & mask;
