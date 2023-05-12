@@ -14,9 +14,6 @@ export OUT=out
 export CLANG_PATH=/mnt/disk/tool/kugo/clang
 export PATH=${CLANG_PATH}/bin:${PATH}
 export CLANG_TRIPLE=${CLANG_PATH}/bin/aarch64-linux-gnu-
-# gcc 绝对路径
-export GCC_PATH=/mnt/disk/tool/kugo/gcc4.9
-export PATH=${GCC_PATH}/bin:${PATH}
 # arch平台，这里时arm64
 export ARCH=arm64
 #export SUBARCH=arm64
