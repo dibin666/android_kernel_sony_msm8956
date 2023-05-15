@@ -11,7 +11,7 @@ export KERNEL_DEFCONFIG=loire_kugo_defconfig
 # 编译临时目录，避免污染根目录
 export OUT=out
 # clang 绝对路径
-export CLANG_PATH=/mnt/disk/tool/kugo/clang
+export CLANG_PATH=/mnt/disk/tool/clang
 export PATH=${CLANG_PATH}/bin:${PATH}
 export CLANG_TRIPLE=${CLANG_PATH}/bin/aarch64-linux-gnu-
 # arch平台，这里时arm64
