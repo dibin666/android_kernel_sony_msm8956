@@ -16,7 +16,7 @@ fi
 # AnyKernel3 路径
 ANYKERNEL3_DIR=$PWD/AnyKernel3/
 # 编译完成后内核名字
-FINAL_KERNEL_ZIP=perf_KernelSU_A13_dibin.zip
+FINAL_KERNEL_ZIP=perf_docker_A13_dibin.zip
 # 内核工作目录
 export KERNEL_DIR=$(pwd)
 # 内核 defconfig 文件
