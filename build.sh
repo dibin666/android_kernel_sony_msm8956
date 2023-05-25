@@ -3,6 +3,7 @@
 # 更新 KernelSU
 read -p "是否更新 KernelSU？(y/n): " choice
 if [ "$choice" = "y" ]; then
+  rm -rf KernelSU
   curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
 fi
 
