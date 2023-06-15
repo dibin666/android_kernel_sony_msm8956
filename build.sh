@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# 添加 Anykernel3
+git clone --depth=1 https://github.com/dibin666/AnyKernel3 -b kugo
+
 # 更新 KernelSU
 read -p "是否更新 KernelSU？(y/n): " choice
 if [ "$choice" = "y" ]; then
@@ -10,7 +13,7 @@ fi
 # AnyKernel3 路径
 ANYKERNEL3_DIR=$PWD/AnyKernel3/
 # 编译完成后内核名字
-FINAL_KERNEL_ZIP=perf_docker_A13_dibin.zip
+FINAL_KERNEL_ZIP=perf_kugo_A13_dibin.zip
 # 内核工作目录
 export KERNEL_DIR=$(pwd)
 # 内核 defconfig 文件
@@ -26,12 +29,12 @@ export ARCH=arm64
 #export SUBARCH=arm64
 # 只使用clang编译需要配置
 export LLVM=1
-export BUILD_INITRAMFS=1
 
 # ./build.sh 4
 
 #16为线程数，可以指定#
-TH_COUNT=16
+TH_COUNT=$(nproc --all)
+
 if [[ "" != "$1" ]]; then
         TH_NUM=$1
 fi
