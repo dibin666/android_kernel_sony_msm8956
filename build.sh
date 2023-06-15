@@ -20,6 +20,7 @@ if [ "$choice" = "y" ]; then
   else
     echo "无效的选择"
     exit 1
+  fi
 fi
 
 # AnyKernel3 路径
@@ -38,15 +39,17 @@ export KERNEL_DEFCONFIG=loire_kugo_defconfig
 export OUT=out
 
 # clang 和 gcc 绝对路径
-export CLANG_PATH=/mnt/disk/tool/clang
+export CLANG_PATH=/mnt/pt2/kernel/tool/clang12
 export PATH=${CLANG_PATH}/bin:${PATH}
-export CLANG_TRIPLE=${CLANG_PATH}/bin/aarch64-linux-gnu-
+export GCC_PATH=/mnt/pt2/kernel/tool/gcc
 
+# 编译参数
 export DEF_ARGS="O=${OUT} \
 				ARCH=arm64 \
                                 CC=clang \
-                                CROSS_COMPILE=${CLANG_PATH}/bin/aarch64-linux-gnu- \
-                                CROSS_COMPILE_ARM32=${CLANG_PATH}/bin/arm-linux-gnueabi- \
+				CLANG_TRIPLE=aarch64-linux-gnu- \
+				CROSS_COMPILE=${GCC_PATH}/aarch64-linux-android-4.9/bin/aarch64-linux-android- \
+                                CROSS_COMPILE_ARM32=${GCC_PATH}/arm-linux-androideabi-4.9/bin/arm-linux-androideabi- \
 				LD=ld.lld "
 
 export BUILD_ARGS="-j$(nproc --all) ${DEF_ARGS}"
@@ -75,8 +78,8 @@ cd $ANYKERNEL3_DIR/
 zip -r $FINAL_KERNEL_ZIP * -x README $FINAL_KERNEL_ZIP
 
 # 复制打包好的 Zip 文件到指定的目录
-cp $ANYKERNEL3_DIR/$FINAL_KERNEL_ZIP /mnt/disk/kernelout && cd ..
+cp $ANYKERNEL3_DIR/$FINAL_KERNEL_ZIP ../../out && cd ..
 
 # 清理目录
 rm -rf AnyKernel3
-rm -rf out/
+rm -rf out
