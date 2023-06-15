@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # 添加 Anykernel3
+rm -rf AnyKernel3
 git clone --depth=1 https://github.com/dibin666/AnyKernel3 -b kugo
 
 # 更新 KernelSU
@@ -20,55 +21,58 @@ export KERNEL_DIR=$(pwd)
 export KERNEL_DEFCONFIG=loire_kugo_defconfig
 # 编译临时目录，避免污染根目录
 export OUT=out
-# clang 绝对路径
+# clang 和 gcc 绝对路径
 export CLANG_PATH=/mnt/disk/tool/clang
 export PATH=${CLANG_PATH}/bin:${PATH}
 export CLANG_TRIPLE=${CLANG_PATH}/bin/aarch64-linux-gnu-
-# arch平台，这里时arm64
-export ARCH=arm64
-#export SUBARCH=arm64
-# 只使用clang编译需要配置
-export LLVM=1
-
-# ./build.sh 4
-
-#16为线程数，可以指定#
-TH_COUNT=$(nproc --all)
-
-if [[ "" != "$1" ]]; then
-        TH_NUM=$1
-fi
+export 
 
 export DEF_ARGS="O=${OUT} \
+				ARCH=arm64 \
                                 CC=clang \
-				ARCH=${ARCH} \
                                 CROSS_COMPILE=${CLANG_PATH}/bin/aarch64-linux-gnu- \
                                 CROSS_COMPILE_ARM32=${CLANG_PATH}/bin/arm-linux-gnueabi- \
 				LD=ld.lld "
 
-export BUILD_ARGS="-j${TH_COUNT} ${DEF_ARGS}"
+export BUILD_ARGS="-j$(nproc --all) ${DEF_ARGS}"
 
-echo -e "$yellow**** 开始编译内核 ****$nocol"
+# 开始编译内核
 make ${DEF_ARGS} ${KERNEL_DEFCONFIG}
 make ${BUILD_ARGS}
 
-echo -e "$yellow**** 验证 Image.gz-dtb ****$nocol"
+# 验证 Image.gz-dtb
 ls $PWD/out/arch/arm64/boot/Image.gz-dtb
-echo -e "$yellow**** 进入 AnyKernel3 目录 ****$nocol"
+
+# 进入 AnyKernel3 目录
 ls $ANYKERNEL3_DIR
-echo -e "$yellow**** 清理 AnyKernel3 目录 ****$nocol"
+
+# 清理 AnyKernel3 目录
 rm -rf $ANYKERNEL3_DIR/Image.gz-dtb
 rm -rf $ANYKERNEL3_DIR/$FINAL_KERNEL_ZIP
-echo -e "$yellow**** 复制 Image.gz-dtb 到 AnyKernel3 目录 ****$nocol"
-cp $PWD/out/arch/arm64/boot/Image.gz-dtb $ANYKERNEL3_DIR/
-echo -e "$yellow**** 正在打包内核为可刷入 Zip 文件 ****$nocol"
+
+# 复制编译出的文件到 AnyKernel3 目录
+if [[ -f out/arch/arm64/boot/Image.gz-dtb ]]; then
+  cp out/arch/arm64/boot/Image.gz-dtb AnyKernel3/Image.gz-dtb
+elif [[ -f out/arch/arm64/boot/Image-dtb ]]; then
+  cp out/arch/arm64/boot/Image-dtb AnyKernel3/Image-dtb
+elif [[ -f out/arch/arm64/boot/Image.gz ]]; then
+  cp out/arch/arm64/boot/Image.gz AnyKernel3/Image.gz
+elif [[ -f out/arch/arm64/boot/Image ]]; then
+  cp out/arch/arm64/boot/Image AnyKernel3/Image
+fi
+
+if [ -f out/arch/arm64/boot/dtbo.img ]; then
+  cp out/arch/arm64/boot/dtbo.img AnyKernel3/dtbo.img
+fi
+
+# 打包内核为可刷入 Zip 文件
 cd $ANYKERNEL3_DIR/
-zip -r9 $FINAL_KERNEL_ZIP * -x README $FINAL_KERNEL_ZIP
-echo -e "$yellow**** 复制打包好的 Zip 文件到指定的目录 ****$nocol"
-cp $ANYKERNEL3_DIR/$FINAL_KERNEL_ZIP /mnt/disk/kernelout
-echo -e "$yellow**** 清理目录 ****$nocol"
-cd ..
+zip -r $FINAL_KERNEL_ZIP * -x README $FINAL_KERNEL_ZIP
+
+# 复制打包好的 Zip 文件到指定的目录
+cp $ANYKERNEL3_DIR/$FINAL_KERNEL_ZIP /mnt/disk/kernelout && cd ..
+
+# 清理目录
 rm -rf $ANYKERNEL3_DIR/$FINAL_KERNEL_ZIP
 rm -rf $ANYKERNEL3_DIR/Image.gz-dtb
 rm -rf out/
-echo -e "$yellow**** 构建完成 ****$nocol"
