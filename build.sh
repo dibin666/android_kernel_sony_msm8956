@@ -23,11 +23,14 @@ if [ "$choice" = "y" ]; then
   fi
 fi
 
+# 当前时间
+current_time=$(date +"%Y-%m-%d-%H")
+
 # AnyKernel3 路径
 ANYKERNEL3_DIR=$PWD/AnyKernel3/
 
 # 编译完成后内核名字
-FINAL_KERNEL_ZIP=perf_kugo_A13_dibin.zip
+FINAL_KERNEL_ZIP=AnyKernel3-perf-kugo-${current_time}.zip
 
 # 内核工作目录
 export KERNEL_DIR=$(pwd)
@@ -39,7 +42,7 @@ export KERNEL_DEFCONFIG=loire_kugo_defconfig
 export OUT=out
 
 # clang 和 gcc 绝对路径
-export CLANG_PATH=/mnt/pt2/kernel/tool/clang12
+export CLANG_PATH=/mnt/pt2/kernel/tool/clang17
 export PATH=${CLANG_PATH}/bin:${PATH}
 export GCC_PATH=/mnt/pt2/kernel/tool/gcc
 
@@ -78,8 +81,28 @@ cd $ANYKERNEL3_DIR/
 zip -r $FINAL_KERNEL_ZIP * -x README $FINAL_KERNEL_ZIP
 
 # 复制打包好的 Zip 文件到指定的目录
-cp $ANYKERNEL3_DIR/$FINAL_KERNEL_ZIP ../../out && cd ..
+cp $ANYKERNEL3_DIR/$FINAL_KERNEL_ZIP ../../out
+
+# 上传打包好的 Zip 文件到 Telegram 频道
+# 设置Telegram Bot的API令牌和频道ID
+TOKEN="6188260032:AAEAegXX69-U8nZiEsykwr0BrxBdrpaTF0c"
+CHANNEL_ID="-1001918020760"
+
+# 要上传的文件路径
+FILE_PATH="$FINAL_KERNEL_ZIP"
+
+# 要发送的消息内容
+MESSAGE="Kernel build successfully!"
+
+# 发送API请求，上传文件到Teleram频道
+curl -F chat_id="$CHANNEL_ID" -F document=@"$FILE_PATH" "https://api.telegram.org/bot$TOKEN/sendDocument"
+
+# 发送API请求，发送消息到Telegram频道
+curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" \
+    -d "chat_id=$CHANNEL_ID" \
+    -d "text=$MESSAGE"
 
 # 清理目录
+cd ..
 rm -rf AnyKernel3
 rm -rf out
